@@ -1,0 +1,46 @@
+import os, sys
+
+try:
+    import shapefile
+except ModuleNotFoundError:
+    os.system("pip install pyshp")
+
+    
+shpFiles = []
+for file in os.listdir():
+    if file.endswith(".shp"):
+            shpFiles.append(file)
+print("Select the ShapeFile you want to use:\n")
+
+if not shpFiles:
+    input("I can't find any shapefiles...")
+    input()
+    exit()
+else:
+    for i in shpFiles:
+        print(str((shpFiles.index(i)+1))+" - " + str(i))
+        
+shpChoice = input()
+Shptouse = shpFiles[(int(shpChoice)-1)]
+
+#read shapefile
+myShp = shapefile.Reader(Shptouse)
+
+#make a text file
+f = open("OV_Tiles.txt", "w")
+f.write('"ID" "ULx" "ULy" "LLx" "LLy" \n')
+print("Witing TSP file as such: \n \n")
+for i in range(len(myShp)):
+    s = myShp.shape(i)
+    r = myShp.record(i)
+    quad = r['NAME']
+    line = str(s.bbox)
+    clean = line.lstrip('[').strip(']')
+    clean = clean.replace(',','')
+    print(quad+' '+clean.replace(' ',' '))
+    f.write(quad+'	'+clean.replace(' ','	')+"\n")
+    
+    
+
+f.close()
+input("\n Done")
